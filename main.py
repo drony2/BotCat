@@ -1,5 +1,3 @@
-import re
-
 import telebot
 from telebot import types
 import config
@@ -18,13 +16,11 @@ def start(message):
     markup.add(button_cat_voice)
     button_miu = types.InlineKeyboardButton("Миу", callback_data='cat_miu')
     markup.add(button_miu)
-    button_help = types.InlineKeyboardButton("Help", callback_data='cat_help')
-    markup.add(button_help)
-    button_my_tg = types.InlineKeyboardButton("Тот кто создал бота", url="https://t.me/dornall", callback_data="my_tg")
+    button_my_tg = types.InlineKeyboardButton("Тот кто создал бота(Поможет всегда)", url="https://t.me/dornall",
+                                              callback_data="my_tg")
     markup.add(button_my_tg)
 
     bot.send_message(message.chat.id, f"Привет, {message.from_user.first_name}! \nМеню)", reply_markup=markup)
-
     print(message.text)
 
 
@@ -36,7 +32,6 @@ def start_button_ck(call):
     elif call.data == 'cat_photo':
         print(call.message.text)
         step_Set_Price(message=call.message)
-
         print("Button_photo")
     elif call.data == 'cat_voice':
         start_audio(call.message)
@@ -46,9 +41,6 @@ def start_button_ck(call):
         print("Button_video")
     elif call.data == 'my_tg':
         print("Butthon_my_tg")
-    elif call.data == 'cat_help':
-        bot.send_message(chat_id=call.message.chat.id, text="Все команды бота: \n1) /video \n2) /audio\n3) /photo")
-        print("Butthon_cat_help")
 
 
 @bot.message_handler(commands=['video'])
@@ -86,6 +78,9 @@ def sticket(message):
             print(message.text)
         case "\U0001F408":
             bot.send_message(chat_id, 'I love you')
+            print(message.text)
+        case "Меню":
+            start(message)
             print(message.text)
         case _:
             if message.text == "/photo":
