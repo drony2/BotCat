@@ -29,9 +29,10 @@ def start_button_ck(call):
     if call.data == 'cat_miu':
         bot.send_message(chat_id=call.message.chat.id, text="Миу")
         print("Button_Miu")
+        start(call.message)
     elif call.data == 'cat_photo':
         print(call.message.text)
-        step_Set_Price(message=call.message)
+        cat_photo(message=call.message)
         print("Button_photo")
     elif call.data == 'cat_voice':
         start_audio(call.message)
@@ -48,6 +49,7 @@ def start_video(message):
     video = open('source/cotic.mp4', 'rb')
     bot.send_video(chat_id=message.chat.id, video=video)
     print(message.text)
+    start(message)
 
 
 @bot.message_handler(commands=['audio'])
@@ -55,6 +57,7 @@ def start_audio(message):
     audio = open('source/mur.mp3', 'rb')
     bot.send_voice(chat_id=message.chat.id, voice=audio)
     print(message.text)
+    start(message)
 
 
 @bot.message_handler(content_types=['text', 'sticker'])
@@ -64,21 +67,27 @@ def sticket(message):
         case '🐈':
             bot.send_message(chat_id, 'Эта котя лижит ножку')
             print(message.text)
+            start(message)
         case "🐱":
             bot.send_message(chat_id, 'Эта котя лижит ляпку')
             print(message.text)
+            start(message)
         case "💥":
             bot.send_message(chat_id, 'Это бум')
             print(message.text)
+            start(message)
         case "🍜":
             bot.send_message(chat_id, 'Это еда кись')
             print(message.text)
+            start(message)
         case "❤️":
             bot.send_message(chat_id, 'I love you')
             print(message.text)
+            start(message)
         case "\U0001F408":
             bot.send_message(chat_id, 'I love you')
             print(message.text)
+            start(message)
         case "Меню":
             start(message)
             print(message.text)
@@ -93,11 +102,11 @@ def sticket(message):
 @bot.message_handler(commands=['photo'])
 def cat_photo(message):
     chat_id = message.chat.id
-    bot.register_next_step_handler(bot.send_message(chat_id, 'Введи сколько(числом не более 4): '), step_Set_Price)
+    bot.register_next_step_handler(bot.send_message(chat_id, 'Введи сколько(числом не более 4): '), enter_photo)
     print(message.text)
 
 
-def step_Set_Price(message):
+def enter_photo(message):
     cid = message.chat.id
     user_text = message.text
     if not ("Меню" in user_text):
@@ -110,6 +119,7 @@ def step_Set_Price(message):
             phot = open(f"source/Cat{i + 1}.jpg", "rb")
             bot.send_photo(chat_id=cid, photo=phot)
             print("Кинул фото")
+    start(message)
 
 
 bot.polling(none_stop=True)
