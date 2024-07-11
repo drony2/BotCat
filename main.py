@@ -1,12 +1,18 @@
 import telebot
+
 from telebot import types
 import config
+import psycopg2
+
 
 bot = telebot.TeleBot(config.token)
+con = psycopg2.connect(host='localhost',user='postgres', password='12345', dbname='Test', port=3591)
+cur = con.cursor()
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
+
     markup = types.InlineKeyboardMarkup()
     button_cat_video = types.InlineKeyboardButton("Видео с котиками", callback_data='cat_video')
     markup.add(button_cat_video)
@@ -19,9 +25,11 @@ def start(message):
     button_my_tg = types.InlineKeyboardButton("Тот кто создал бота(Поможет всегда)", url="https://t.me/dornall",
                                               callback_data="my_tg")
     markup.add(button_my_tg)
-
     bot.send_message(message.chat.id, f"Привет, {message.from_user.first_name}! \nМеню)", reply_markup=markup)
-    print(message.text)
+    cur.execute(f"insert into Users values (DEFAULT,'{message.from_user.first_name}')")
+    con.commit()
+
+    print("Выслал "+message.text)
 
 
 @bot.callback_query_handler(func=lambda call: True)
