@@ -1,3 +1,4 @@
+import datetime
 import telebot
 from telebot import types
 import config
@@ -5,13 +6,12 @@ import psycopg2
 
 
 bot = telebot.TeleBot(config.token)
-con = psycopg2.connect(host='localhost',user='postgres', password='12345', dbname='Test', port=3591)
+con = psycopg2.connect(host='localhost', user='postgres', password='12345', dbname='Test', port=3591)
 cur = con.cursor()
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
-
     markup = types.InlineKeyboardMarkup()
     button_cat_video = types.InlineKeyboardButton("Видео с котиками", callback_data='cat_video')
     markup.add(button_cat_video)
@@ -70,7 +70,7 @@ def start_audio(message):
 
 
 @bot.message_handler(content_types=['text', 'sticker'])
-def sticket(message):
+def text_sticket(message):
     chat_id = message.chat.id
     match message.text:
         case '🐈':
@@ -151,19 +151,21 @@ def select_info(message):
     record = record[0]
 
     for i in range(int(record)):
-        cur.execute(f"select Name from users where id = {i+1}")
+        cur.execute(f"select Name from users where id = {i + 1}")
         record1 = str(cur.fetchone())
         length = len(record1)
         record1 = record1[2:] + record1[3:]
         record1 = record1[:length-5]
-
-        bot.send_message(chat_id=chat_id, text=f"{i+1}) "+record1)
+        bot.send_message(chat_id=chat_id, text=f"{i+1}) " + record1)
 
 
 def insert_users(message):
-    cur.execute(f"insert into Users values (DEFAULT,'{message.from_user.first_name}', '{message.from_user.id}')")
-    con.commit()
+    cur.execute(f"select date from users where date = '{str(datetime.date.today())}'")
+    record = str(cur.fetchone())
+    if not record:
+        cur.execute(f"insert into Users values (DEFAULT,'{message.from_user.first_name}', '{message.from_user.id}', "
+                    f"'{str(datetime.date.today())}')")
+        con.commit()
 
 
 bot.polling(none_stop=True)
-
