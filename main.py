@@ -19,7 +19,7 @@ def start(message):
     markup.add(button_cat_photo)
     button_cat_voice = types.InlineKeyboardButton("Мурлыканье", callback_data='cat_voice')
     markup.add(button_cat_voice)
-    button_miu = types.InlineKeyboardButton("Миу", callback_data='cat_miu')
+    button_miu = types.InlineKeyboardButton("Миу", callback_data='cat_miu', )
     markup.add(button_miu)
     button_my_tg = types.InlineKeyboardButton("Тот кто создал бота(Поможет всегда)", url="https://t.me/dornall",
                                               callback_data="my_tg")
@@ -36,18 +36,23 @@ def start_button_ck(call):
         bot.send_message(chat_id=call.message.chat.id, text="Миу")
         print("Button_Miu")
         start(call.message)
+        bot.answer_callback_query(callback_query_id=call.id)
     elif call.data == 'cat_photo':
         print(call.message.text)
         cat_photo(message=call.message)
         print("Button_photo")
+        bot.answer_callback_query(callback_query_id=call.id)
     elif call.data == 'cat_voice':
         start_audio(call.message)
         print("Button_voice")
+        bot.answer_callback_query(callback_query_id=call.id)
     elif call.data == 'cat_video':
         start_video(call.message)
         print("Button_video")
+        bot.answer_callback_query(callback_query_id=call.id)
     elif call.data == 'my_tg':
         print("Butthon_my_tg")
+        bot.answer_callback_query(callback_query_id=call.id)
     insert_users(call)
 
 
