@@ -113,8 +113,8 @@ def text_sticket(message):
             insert_users(message)
             print(message.text)
         case "Выведи историю":
-            select_info(message)
             insert_users(message)
+            select_info(message)
             print(message.text)
         case _:
             if message.text == "/photo":
@@ -156,7 +156,7 @@ def select_info(message):
     record = record[0]
 
     for i in range(int(record)):
-        cur.execute(f"select Name from users where id = {i + 1}")
+        cur.execute(f"select name from users where id = {i + 1}")
         record1 = str(cur.fetchone())
         length = len(record1)
         record1 = record1[2:] + record1[3:]
@@ -165,9 +165,9 @@ def select_info(message):
 
 
 def insert_users(message):
-    cur.execute(f"select date from users where date = '{str(datetime.date.today())}'")
+    cur.execute(f"select date from users where date = '{str(datetime.date.today())}' and Name = '{str(message.from_user.first_name)}'")
     record = str(cur.fetchone())
-    if not record:
+    if record == 'None':
         cur.execute(f"insert into Users values (DEFAULT,'{message.from_user.first_name}', '{message.from_user.id}', "
                     f"'{str(datetime.date.today())}')")
         con.commit()
