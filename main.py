@@ -1,4 +1,6 @@
 import datetime
+import random
+
 import telebot
 from telebot import types
 import config
@@ -24,8 +26,12 @@ def start(message):
     button_my_tg = types.InlineKeyboardButton("Тот кто создал бота(Поможет всегда)", url="https://t.me/dornall",
                                               callback_data="my_tg")
     markup.add(button_my_tg)
-    bot.send_message(message.chat.id, f"Привет, {message.from_user.first_name}! \nМеню)", reply_markup=markup)
-    insert_users(message)
+    if message.from_user.first_name == "testBot":
+        bot.send_message(message.chat.id, f"Меню", reply_markup=markup)
+
+    else:
+        bot.send_message(message.chat.id, f"Привет, {message.from_user.first_name}! \nМеню", reply_markup=markup)
+        insert_users(message)
 
     print("Выслал " + message.text)
 
@@ -33,7 +39,7 @@ def start(message):
 @bot.callback_query_handler(func=lambda call: True)
 def start_button_ck(call):
     if call.data == 'cat_miu':
-        bot.send_message(chat_id=call.message.chat.id, text="Миу")
+        game(call.message)
         print("Button_Miu")
         start(call.message)
         bot.answer_callback_query(callback_query_id=call.id)
@@ -156,21 +162,32 @@ def select_info(message):
     record = record[0]
 
     for i in range(int(record)):
-        cur.execute(f"select name from users where id = {i + 1}")
+        cur.execute(f"select Name,date from users where id = {i + 1}")
         record1 = str(cur.fetchone())
-        length = len(record1)
-        record1 = record1[2:] + record1[3:]
-        record1 = record1[:length-5]
+        record1 = record1[2:]
+        record1 = record1.replace("', datetime.date(", ": ")
+        record1 = record1.replace("))", "")
+        record1 = record1.replace(", ", "-")
         bot.send_message(chat_id=chat_id, text=f"{i+1}) " + record1)
 
 
 def insert_users(message):
-    cur.execute(f"select date from users where date = '{str(datetime.date.today())}' and Name = '{str(message.from_user.first_name)}'")
+    cur.execute(f"select date from users where date = '{str(datetime.date.today())}' "
+                f"and Name = '{str(message.from_user.first_name)}'")
     record = str(cur.fetchone())
     if record == 'None':
-        cur.execute(f"insert into Users values (DEFAULT,'{message.from_user.first_name}', '{message.from_user.id}', "
+        cur.execute(f"insert into Users values (DEFAULT,'{message.from_user.first_name}', {message.from_user.id}, "
                     f"'{str(datetime.date.today())}')")
         con.commit()
+
+
+def game(message):
+    a = random.randint(0, 1)
+    mass = ["Орел", "Решка"]
+    if mass[a] == "Решка":
+        bot.send_message(message.chat.id, f"Выграла - {mass[a]}")
+    else:
+        bot.send_message(message.chat.id, f"Выграл - {mass[a]}")
 
 
 bot.polling(none_stop=True)
