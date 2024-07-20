@@ -2,8 +2,10 @@ import datetime
 import random
 import telebot
 from telebot import types
+import translators as ts
 import config
 import psycopg2
+import pyjokes
 
 
 bot = telebot.TeleBot(config.token)
@@ -22,6 +24,8 @@ def start(message):
     markup.add(button_cat_voice)
     button_miu = types.InlineKeyboardButton("Миу", callback_data='cat_miu', )
     markup.add(button_miu)
+    button_jokes = types.InlineKeyboardButton("Шутка дня", callback_data='cat_jokes', )
+    markup.add(button_jokes)
     button_my_tg = types.InlineKeyboardButton("Тот кто создал бота(Поможет всегда)", url="https://t.me/dornall",
                                               callback_data="my_tg")
     markup.add(button_my_tg)
@@ -58,6 +62,12 @@ def start_button_ck(call):
     elif call.data == 'my_tg':
         print("Butthon_my_tg")
         bot.answer_callback_query(callback_query_id=call.id)
+    elif call.data == 'cat_jokes':
+        joke = pyjokes.get_joke()
+        result = ts.translate_text(joke, to_language='ru')
+        bot.send_message(call.message.chat.id, result)
+        bot.answer_callback_query(callback_query_id=call.id)
+        print("Butthon_cat_jokes")
     insert_users(call)
 
 
